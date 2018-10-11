@@ -7,7 +7,7 @@
         {
             "run_at": "document_end",
             "matches": [
-                "https://gitlab.nordstrom.com/*/merge_requests"
+                "https://gitlab.nordstrom.com/*/merge_requests*"
             ],
             "js": [
                 "thirdparty/jquery.min.js",
