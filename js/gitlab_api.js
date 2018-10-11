@@ -2,7 +2,6 @@
 
 const host = 'nordstrom'
 const svcHost = `https://gitlab.${host}.com/api/v4`
-const projectId = 8793
 const HTTP_GET = 'GET'
 
 /**
@@ -10,7 +9,7 @@ const HTTP_GET = 'GET'
  * @param {Integer} mergeRequestId the merge request iid.
  * @returns xhr response.
  */
-function getApprovals (mergeRequestId) {
+function getApprovals (projectId, mergeRequestId) {
   console.log(`Fetching approvals... (MR iid: ${mergeRequestId})`)
   return makeXhrRequest(
     HTTP_GET,

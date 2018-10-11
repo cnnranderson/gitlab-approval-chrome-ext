@@ -1,17 +1,28 @@
 'use strict'
 
 /**
+ * Scrapes the project id from the page.
+ * @returns the GitLab project id of the currently viewed repo.
+ */
+function getProjectId () {
+  return $('[name="project_id"]').val()
+}
+
+/**
  * Scrapes through and gets the ids of the Merge Requests that are currently visible on the page.
  */
 function parseMergeRequestsOnPage () {
   console.log('Getting merge request ids')
+
+  // Get the project id
+  var projectId = getProjectId()
 
   // Iterate through all Merge Requests in the list
   $('.merge-request').each(function (index) {
     // Parse out the Merge Request Iid (used for getting appr)
     var ref = $(this).find('.merge-request-title-text a:first').attr('href').split('/')
     var requestId = ref[ref.length - 1]
-    parseApprovals(requestId, this)
+    parseApprovals(projectId, requestId, this)
   })
 }
 
@@ -21,8 +32,8 @@ function parseMergeRequestsOnPage () {
  * @param {Integer} mergeRequestId the id of a given Merge Request in GitLab.
  * @param {Element} requestView the HTML element reference to the Merge Request row.
  */
-function parseApprovals (mergeRequestId, requestView) {
-  getApprovals(mergeRequestId)
+function parseApprovals (projectId, mergeRequestId, requestView) {
+  getApprovals(projectId, mergeRequestId)
     .then(function (mergeRequest) {
       if (mergeRequest.approved_by.length === 0) {
         console.log(`No approvals for: ${mergeRequestId}`)
