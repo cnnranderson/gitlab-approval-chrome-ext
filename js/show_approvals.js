@@ -15,16 +15,14 @@ function parseMergeRequestsOnPage () {
 function parseApprovals (mergeRequestId, requestView) {
   getApprovals(mergeRequestId)
     .then(function (mergeRequest) {
-      if (mergeRequest.approved_by.length > 0) {
-        injectApprovalList(requestView, mergeRequest.approved_by, mergeRequest.suggested_approvers)
-      } else {
+      if (mergeRequest.approved_by.length === 0) {
         console.log(`No approvals for: ${mergeRequestId}`)
-        injectApprovalList(requestView, [], [])
       }
+      injectApprovalList(requestView, mergeRequest.approvals_left, mergeRequest.approved_by)
     })
 }
 
-function injectApprovalList (requestView, approvalUsers, potentialApprovalUsers) {
+function injectApprovalList (requestView, requiredApprovals, approvalUsers) {
   var listContainer = `<div class="approved-by-users approvals-footer clearfix mr-info-list"><div class="approvers-prefix"><p>Approved by</p><div class="approvers-list">`
   approvalUsers.forEach(entry => {
     listContainer += `<div class='link-to-member-avatar'>
@@ -34,8 +32,8 @@ function injectApprovalList (requestView, approvalUsers, potentialApprovalUsers)
       </a>
     </div>`
   })
-  var approvalCount = approvalUsers.length
-  while (approvalCount < 2) {
+  var i = 0
+  for (i = 0; i < requiredApprovals; i++) {
     listContainer += `<div class='link-to-member-avatar'>
       <a href="" data-container="body" class="author_link disabled">
         <span width="20" height="20" class="s20 avatar avatar-inline avatar-placeholder">
@@ -45,7 +43,6 @@ function injectApprovalList (requestView, approvalUsers, potentialApprovalUsers)
         </span>
       </a>
     </div>`
-    approvalCount++
   }
 
   listContainer += `</div></div></div>`
