@@ -1,8 +1,8 @@
 {
     "name": "GitLab Approvals",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Displays the approvals for a given MR within the MR list.",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "content_scripts": [
         {
             "run_at": "document_end",
@@ -18,7 +18,9 @@
     ],
     "permissions": [
         "activeTab",
+        "storage",
         "https://gitlab.nordstrom.com/*"
     ],
+    "options_page": "html/options.html",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self' https://gitlab.nordstrom.com/*/merge_requests"
 }

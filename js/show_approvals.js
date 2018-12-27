@@ -1,5 +1,7 @@
 'use strict'
 
+var compactApprovals = false
+
 /**
  * Scrapes the project id from the page.
  * @returns the GitLab project id of the currently viewed repo.
@@ -100,5 +102,18 @@ function createRequiredApprovalDiv () {
   </div>`
 }
 
-// Get all merge requests
-parseMergeRequestsOnPage()
+/*
+ * Loads up the settings, and then begins pulling in the merge request approval info.
+ */
+function getSettingsAndStart () {
+  chrome.storage.local.get(['compact-approval'], function (result) {
+    compactApprovals = result['compact-approval']
+    console.log(compactApprovals)
+
+    // Get all merge requests
+    parseMergeRequestsOnPage()
+  })
+}
+
+// Begin running
+getSettingsAndStart()
