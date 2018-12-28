@@ -21,6 +21,12 @@
         "storage",
         "https://gitlab.nordstrom.com/*"
     ],
+    "icons": {
+        "16": "images/gitlab.png",
+        "32": "images/gitlab.png",
+        "48": "images/gitlab.png",
+        "128": "images/gitlab.png"
+      },
     "options_page": "html/options.html",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self' https://gitlab.nordstrom.com/*/merge_requests"
 }
