@@ -1,5 +1,9 @@
 'use strict'
 
+// Settings
+var compactApprovals = false
+var authorEnabled = false
+
 /**
  * Scrapes the project id from the page.
  * @returns the GitLab project id of the currently viewed repo.
@@ -38,7 +42,18 @@ function parseApprovals (projectId, mergeRequestId, requestView) {
       if (mergeRequest.approved_by.length === 0) {
         console.log(`No approvals for: ${mergeRequestId}`)
       }
-      injectApprovalList(requestView, mergeRequest.approvals_left, mergeRequest.approved_by)
+
+      // Add the larger author div
+      if (authorEnabled) {
+        injectAuthorView(requestView)
+      }
+
+      // Add the approval divs
+      if (compactApprovals) {
+        injectApprovalListCompact(requestView, mergeRequest.approvals_left, mergeRequest.approved_by)
+      } else {
+        injectApprovalList(requestView, mergeRequest.approvals_left, mergeRequest.approved_by)
+      }
     })
 }
 
@@ -71,6 +86,45 @@ function injectApprovalList (requestView, requiredApprovalsLeft, approvalUsers) 
 }
 
 /**
+ * Injects a simliar approval list that is found within an Merge Request page (except in a more compact way)
+ * @param {Element} requestView the HTML element reference to the Merge Request row.
+ * @param {Integer} requiredApprovalsLeft the number of approvals left to allow for a merge.
+ * @param {List<GitLab.User>} approvalUsers the users that have approved this Merge Request.
+ */
+function injectApprovalListCompact (requestView, requiredApprovalsLeft, approvalUsers) {
+  // Create the initial divs that wrap the approvals -- similar to the one found when viewing the MR
+  var listContainer = `<div class="approved-by-users approvals-footer"><div class="approvers-prefix"><div class="approvers-list">`
+  approvalUsers.forEach(entry => {
+    listContainer += createApprovalDiv(entry.user)
+  })
+
+  // Insert required approval slots (if any are needed)
+  var i = 0
+  for (i = 0; i < requiredApprovalsLeft; i++) {
+    listContainer += createRequiredApprovalDiv()
+  }
+
+  // Close the container
+  listContainer += `</div></div></div>`
+
+  // Inject the list
+  $(listContainer).insertAfter($(requestView).find('.issuable-pipeline-status'))
+}
+
+/**
+ * Moves and enlarges the author image to the left hand side when enabled.
+ * @param {Element} requestView the HTML element reference to the Merge Request row.
+ */
+function injectAuthorView (requestView) {
+  $(requestView).find('a.author_link.has-tooltip')
+    .find('img')
+    .removeClass('s16')
+    .addClass('s36')
+    .parent()
+    .prependTo(requestView)
+}
+
+/**
  * Generates a div based on the provided user info.
  * @param {GitLab.User} user an user approval object from the GitLab API.
  */
@@ -82,6 +136,11 @@ function createApprovalDiv (user) {
                       src="${user.avatar_url}">
     </a>
   </div>`
+}
+
+function createAuthorDiv () {
+  return `<a class="author_link has-tooltip" title="" data-container="body" href="/Toan.Vu" data-original-title="Assigned to Toan Vu"><img
+            width="24" class="avatar avatar-inline s42 js-lazy-loaded" alt="" src="/uploads/-/system/user/avatar/1704/avatar.png"></a>`
 }
 
 /**
@@ -100,5 +159,18 @@ function createRequiredApprovalDiv () {
   </div>`
 }
 
-// Get all merge requests
-parseMergeRequestsOnPage()
+/*
+ * Loads up the settings, and then begins pulling in the merge request approval info.
+ */
+function getSettingsAndStart () {
+  chrome.storage.local.get(null, function (settings) {
+    compactApprovals = settings['compact-approval']
+    authorEnabled = settings['author']
+
+    // Get all merge requests
+    parseMergeRequestsOnPage()
+  })
+}
+
+// Begin running
+getSettingsAndStart()

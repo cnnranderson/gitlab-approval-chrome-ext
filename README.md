@@ -21,7 +21,14 @@ Currently, this is tied to my personal workplace domain hosting of GitLab. I wis
 If you'd like it to work on other domains, feel free to modify the source urls found in the `manifest.json` and `js/gitlab_api.js`.
 
 ## Changelog
-### Oct. 11th, 2018:
+### Dec. 27th, 2018 (v1.1):
+* Added Icon for the Extension
+* Added simple settings page (Note: You need to _*reload*_ the merge request page after changing the settings)
+  * Compact View -- Enable this to bring the approvals to the right hand side of the page.
+  * Author View -- Helps display the author more prominantly on the left hand side.
+* Updated to version 1.1
+
+### Oct. 11th, 2018 (v1.0):
 * Initial Release
 * Only Works under one domain currently
 * Loads approvals into view when viewing the list of Merge Requests
