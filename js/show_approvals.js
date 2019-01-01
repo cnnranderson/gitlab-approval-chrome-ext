@@ -108,7 +108,11 @@ function injectApprovalListCompact (requestView, requiredApprovalsLeft, approval
   listContainer += `</div></div></div>`
 
   // Inject the list
-  $(listContainer).insertAfter($(requestView).find('.issuable-pipeline-status'))
+  if ($(requestView).find('.issuable-upvotes').length) {
+    $(listContainer).insertBefore($(requestView).find('.issuable-upvotes'))
+  } else {
+    $(listContainer).insertBefore($(requestView).find('.issuable-comments'))
+  }
 }
 
 /**
