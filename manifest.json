@@ -1,6 +1,6 @@
 {
     "name": "GitLab Approvals",
-    "version": "1.1",
+    "version": "1.1.1",
     "description": "Displays the approvals for a given MR within the MR list.",
     "manifest_version": 3,
     "content_scripts": [
