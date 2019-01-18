@@ -1,8 +1,8 @@
 {
     "name": "GitLab Approvals",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Displays the approvals for a given MR within the MR list.",
-    "manifest_version": 3,
+    "manifest_version": 4,
     "content_scripts": [
         {
             "run_at": "document_end",
@@ -12,7 +12,8 @@
             "js": [
                 "thirdparty/jquery.min.js",
                 "js/gitlab_api.js",
-                "js/show_approvals.js"
+                "js/show_approvals.js",
+                "js/cache_util.js"
             ]
         }
     ],

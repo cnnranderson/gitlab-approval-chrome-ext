@@ -1,0 +1,13 @@
+#options-container {
+    background: #E8F1F2;
+    height: 100vh;
+    width: 100%;
+}
+
+.withspace-md {
+    padding: 20px;
+}
+
+.withspace-sm {
+    padding: 10px;
+}
