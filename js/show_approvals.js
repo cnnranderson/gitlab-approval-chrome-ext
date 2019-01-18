@@ -28,19 +28,26 @@ function parseMergeRequestsOnPage (page, pageType) {
           getCachedMergeRequest(`${projectId}:${mr.iid}`, function (cachedResult) {
             var checkDate = new Date(cachedResult.updated_at) < new Date(mr.updated_at)
             if (checkDate) {
-              dothing(projectId, mr.iid)
+              onCacheEntryChecked(projectId, mr.iid)
             } else {
-              dothing(projectId, mr.iid, cachedResult)
+              onCacheEntryChecked(projectId, mr.iid, cachedResult)
             }
           })
         })
       }
     }).then(function () {
+      // TODO: Clean?
       // cleanupCache(liveCacheRefIds)
     })
 }
 
-function dothing (projectId, requestIid, cachedMergeRequest) {
+/**
+ * Determines whether to fetch and cache a new MR data point or inject a cache entry.
+ * @param {Integer} projectId the project id.
+ * @param {Integer} requestIid the merge request iid.
+ * @param {Object.MergeRequest} cachedMergeRequest a cached merge request approval data set. Could be undefined if no cache entry exists.
+ */
+function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
   let mergeRequestView = $(`a[href*="/merge_requests/${requestIid}"`).parents('li.merge-request')
   if (typeof cachedMergeRequest === 'undefined' || typeof cachedMergeRequest.iid === 'undefined') {
     console.log(`Create new cached entry (MR IID: ${requestIid})`)
@@ -66,10 +73,10 @@ function parseApprovals (projectId, mergeRequestId, requestView) {
 }
 
 /**
- * 
- * @param {*} mergeRequestId 
- * @param {*} mergeRequest 
- * @param {*} requestView 
+ * Handles the injection of approvals for MRs.
+ * @param {*} mergeRequestId the iid of the mr.
+ * @param {*} mergeRequest the merge request data to inject.
+ * @param {*} requestView the view to inject the data into.
  */
 function handleMergeRequestApprovalInjection (mergeRequestId, mergeRequest, requestView) {
   if (mergeRequest.approved_by.length === 0) {
@@ -209,6 +216,11 @@ function getSettingsAndStart () {
   })
 }
 
+/**
+ * Utility method that fetches URL query params of the current tab.
+ * @param {String} key the query param to get.
+ * @param {String} url a prebuilt url to work with instead of the current page.
+ */
 function getQueryParam (key, url) {
   if (!url) url = window.location.href
   key = key.replace(/[\[\]]/g, '\\$&')
