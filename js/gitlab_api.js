@@ -13,7 +13,11 @@ function getMergeRequests (projectId, page, pageType) {
   console.log(`Fetching merge requests' status information... (Project id: ${projectId})`)
   let url = `${svcHost}/projects/${projectId}/merge_requests?order_by=updated_at&`
   if (page) url += `page=${page}&`
-  if (pageType) url += `state=${pageType}&`
+  if (pageType) {
+    url += `state=${pageType}&`
+  } else {
+    url += `state=opened&`
+  }
   return makeXhrRequest(HTTP_GET, url)
 }
 

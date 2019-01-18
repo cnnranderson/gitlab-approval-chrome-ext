@@ -21,6 +21,9 @@ Currently, this is tied to my personal workplace domain hosting of GitLab. I wis
 If you'd like it to work on other domains, feel free to modify the source urls found in the `manifest.json` and `js/gitlab_api.js`.
 
 ## Changelog
+### Jan. 18th, 2019 (v1.2.1):
+* Fixed an issue with the first request for the opened MRs not loading
+
 ### Jan. 17th, 2019 (v1.2.0):
 * Added a caching mechanism
   * Issue: casual usage from teams has been a positive experience. However, rate limiting has been enabled for our team. We're now consistently hitting rate limits due to how many upfront API requests this plugin makes (10 MRs = 10 API requests. This adds up during a quick session.)
