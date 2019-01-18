@@ -5,6 +5,19 @@ const svcHost = `https://gitlab.${host}.com/api/v4`
 const HTTP_GET = 'GET'
 
 /**
+ * Makes a request for the list of MRs to utilize information about their statuses.
+ * @param {Integer} projectId the project id to make the request for.
+ * @return xhr response.
+ */
+function getMergeRequests (projectId, page, pageType) {
+  console.log(`Fetching merge requests' status information... (Project id: ${projectId})`)
+  let url = `${svcHost}/projects/${projectId}/merge_requests?order_by=updated_at&`
+  if (page) url += `page=${page}&`
+  if (pageType) url += `state=${pageType}&`
+  return makeXhrRequest(HTTP_GET, url)
+}
+
+/**
  * Fetches all approvals for a given Merge Request using its iid via an Xhr request.
  * @param {Integer} mergeRequestId the merge request iid.
  * @returns xhr response.
@@ -43,6 +56,7 @@ function makeXhrRequest (method, url) {
 
     // Error handling
     xhr.onerror = function () {
+      console.log(xhr.status)
       reject(Error({
         status: xhr.status,
         statusTextInElse: xhr.statusText

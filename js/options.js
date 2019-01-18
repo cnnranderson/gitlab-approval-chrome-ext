@@ -20,13 +20,11 @@ $(authorCheckbox).change(
 function loadSettings () {
   var compact = 'compact-approval'
   chrome.storage.local.get([compact], function (result) {
-      $(compactApprovalCheckbox).prop('checked', result[compact])
-      console.log(result)
+    $(compactApprovalCheckbox).prop('checked', result[compact])
   })
   var author = 'author'
   chrome.storage.local.get([author], function (result) {
-      $(authorCheckbox).prop('checked', result[author])
-      console.log(result)
+    $(authorCheckbox).prop('checked', result[author])
   })
 }
 loadSettings()

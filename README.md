@@ -25,6 +25,16 @@ If you'd like it to work on other domains, feel free to modify the source urls f
 
 ----
 ## Changelog
+### Jan. 17th, 2019 (v1.2.0):
+* Added a caching mechanism
+  * Issue: casual usage from teams has been a positive experience. However, rate limiting has been enabled for our team. We're now consistently hitting rate limits due to how many upfront API requests this plugin makes (10 MRs = 10 API requests. This adds up during a quick session.)
+  * Benefits: With rate limiting in mind, it only makes sense to reduce the number of calls that the plugin makes. This will reduce the number of subsequent calls from page refreshes or general navigation. This will cause less server load for authenticated API requests. 
+  * How it works: Instead of immediately calling each MR approval list every time we load the page, we will do a check against `/projects/{projectId}/merge_requests` and view the last update time for each MR. If the cache entry is older than the last update time, refresh that cache entry. If the cache matches the last update time, then don't update.
+* Refreshed the styling of the options page
+  * Updated the default settings to use compact approval settings by default.
+  * Added an indicator that displays "Saved!" whenever a user changes their settings.
+* Fix alignment of missing approval circles to match other approval margins
+
 ### Jan. 1st, 2019 (v1.1.1):
 * Fix compact approvals
   * Using a different element to key off of where to place (originally pipeline status -- wasn't always there).
@@ -34,7 +44,7 @@ If you'd like it to work on other domains, feel free to modify the source urls f
 * Added simple settings page (Note: You need to _*reload*_ the merge request page after changing the settings)
   * Compact View -- Enable this to bring the approvals to the right hand side of the page.
   * Author View -- Helps display the author more prominantly on the left hand side.
-* Updated to version 1.1
+* Updated to version 1.1.0 instead of 1.1, changing the versioning scheme.
 
 ### Oct. 11th, 2018 (v1.0.0):
 * Initial Release

@@ -1,12 +1,46 @@
 <!DOCTYPE html>
-  <html>
-    <body>
-      <div>
-        <p>Approval Settings:</p>
-        <input type="checkbox" name="compact-approval" value="compact"> Compact Approval Rows<br>
-        <input type="checkbox" name="author" value="author"> Display MR Author<br>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/checkbox.min.css">
+  <link rel="stylesheet" href="../css/options.css">
+</head>
+
+<body>
+  <div id="options-container" class="ui three column middle aligned center aligned grid">
+    <div class="middle aligned row">
+      <div class="left aligned column">
+        <div class="ui large form">
+          <h2 class="ui top attached header">
+            <i class="settings icon"></i>
+            <div class="content withspace">
+              GitLab Extension Settings
+              <div class="sub header">Manage your preferences</div>
+            </div>
+          </h2>
+          <div class="ui attached segment">
+            <div class="inline field withspace">
+              <div class="ui slider checkbox">
+                <input type="checkbox" name="compact-approval">
+                <label>Compact Approval Rows</label>
+              </div>
+            </div>
+            <div class="inline field withspace">
+              <div class="ui slider checkbox">
+                <input type="checkbox" name="author">
+                <label>Display MR Author on the left</label>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </body>
-    <script src="../thirdparty/jquery.min.js"></script>
-    <script src="../js/options.js"></script>
-  </html>
+    </div>
+  </div>
+</body>
+<script src="../thirdparty/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/checkbox.min.js"></script>
+<script src="../js/options.js"></script>
+
+</html>
