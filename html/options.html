@@ -3,7 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/checkbox.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/popup.min.css">
   <link rel="stylesheet" href="../css/options.css">
 </head>
 
@@ -11,27 +11,42 @@
   <div id="options-container" class="ui three column middle aligned center aligned grid">
     <div class="middle aligned row">
       <div class="left aligned column">
-        <div class="ui large form">
+        <div id="saved-message" class="ui positive hidden message">
+          <div id="saved-message-body" class="header"></div>
+        </div>
+        <div class="ui raised segments">
           <h2 class="ui top attached header">
             <i class="settings icon"></i>
-            <div class="content withspace">
+            <div class="content withspace-md">
               GitLab Extension Settings
               <div class="sub header">Manage your preferences</div>
             </div>
           </h2>
           <div class="ui attached segment">
-            <div class="inline field withspace">
+            <div class="inline field withspace-sm">
               <div class="ui slider checkbox">
                 <input type="checkbox" name="compact-approval">
                 <label>Compact Approval Rows</label>
               </div>
             </div>
-            <div class="inline field withspace">
+            <div class="inline field withspace-sm">
               <div class="ui slider checkbox">
                 <input type="checkbox" name="author">
                 <label>Display MR Author on the left</label>
               </div>
             </div>
+          </div>
+          <div class="ui center aligned segment">
+            <span data-tooltip="Developed by Conner Anderson">
+              <div class="ui mini circular image" data-tooltip="Developed by Conner Anderson">
+                <img src="../images/profile_pic.png" data-tooltip="Developed by Conner Anderson">
+              </div>
+            </span>
+            <a href="https://github.com/cnnranderson/gitlab-approval-chrome-ext">
+              <button class="ui circular github icon button" data-tooltip="Github Repo">
+                <i class="github icon"></i>
+              </button>
+            </a>
           </div>
         </div>
       </div>
@@ -39,8 +54,7 @@
   </div>
 </body>
 <script src="../thirdparty/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/components/checkbox.min.js"></script>
+<script src="../thirdparty/semantic.min.js"></script>
 <script src="../js/options.js"></script>
 
 </html>

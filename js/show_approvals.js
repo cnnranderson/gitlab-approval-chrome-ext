@@ -1,8 +1,8 @@
 'use strict'
 
 // Settings
-var compactApprovals = false
-var authorEnabled = false
+var compactApprovals = true
+var authorEnabled = true
 
 /**
  * Scrapes the project id from the page.
@@ -197,8 +197,12 @@ function getSettingsAndStart () {
   let page = getQueryParam('page')
 
   chrome.storage.local.get(null, function (settings) {
-    compactApprovals = settings['compact-approval']
-    authorEnabled = settings['author']
+    if (settings['compact-approval']) {
+      compactApprovals = settings['compact-approval']
+    }
+    if (settings['author']) {
+      authorEnabled = settings['author']
+    }
 
     // Get all merge requests
     parseMergeRequestsOnPage(page, pageType)

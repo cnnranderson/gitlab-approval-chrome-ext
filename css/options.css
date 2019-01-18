@@ -4,6 +4,10 @@
     width: 100%;
 }
 
-.withspace {
+.withspace-md {
     padding: 20px;
+}
+
+.withspace-sm {
+    padding: 10px;
 }
