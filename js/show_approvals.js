@@ -15,30 +15,25 @@ function getProjectId () {
 /**
  * Scrapes through and gets the ids of the Merge Requests that are currently visible on the page.
  */
-function parseMergeRequestsOnPage (page, pageType) {
+function parseMergeRequestsOnPage () {
   // Get the project id
   var projectId = getProjectId()
   var liveCacheRefIds = []
 
-  getMergeRequests(projectId, page, pageType)
-    .then(function (mergeRequests) {
-      if (typeof mergeRequests !== 'undefined') {
-        mergeRequests.forEach(function (mr) {
-          liveCacheRefIds.push(`${projectId}:${mr.iid}`)
-          getCachedMergeRequest(`${projectId}:${mr.iid}`, function (cachedResult) {
-            var checkDate = new Date(cachedResult.updated_at) < new Date(mr.updated_at)
-            if (checkDate) {
-              onCacheEntryChecked(projectId, mr.iid)
-            } else {
-              onCacheEntryChecked(projectId, mr.iid, cachedResult)
-            }
-          })
-        })
+  $('.merge-request').each(function (index) {
+    // Parse out the Merge Request Iid (used for getting appr)
+    var ref = $(this).find('.merge-request-title-text a:first').attr('href').split('/')
+    var requestIid = ref[ref.length - 1]
+    liveCacheRefIds.push(`${projectId}:${requestIid}`)
+    getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
+      var checkDate = new Date(cachedResult.updated_at) < new Date($(this).find('time').attr('datetime'))
+      if (checkDate) {
+        onCacheEntryChecked(projectId, requestIid)
+      } else {
+        onCacheEntryChecked(projectId, requestIid, cachedResult)
       }
-    }).then(function () {
-      // TODO: Clean?
-      // cleanupCache(liveCacheRefIds)
     })
+  })
 }
 
 /**
@@ -50,10 +45,10 @@ function parseMergeRequestsOnPage (page, pageType) {
 function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
   let mergeRequestView = $(`a[href*="/merge_requests/${requestIid}"`).parents('li.merge-request')
   if (typeof cachedMergeRequest === 'undefined' || typeof cachedMergeRequest.iid === 'undefined') {
-    console.log(`Create new cached entry (MR IID: ${requestIid})`)
+    // console.log(`Create new cached entry (MR IID: ${requestIid})`)
     parseApprovals(projectId, requestIid, mergeRequestView)
   } else {
-    console.log(`Using cached entry (MR IID: ${requestIid})`)
+    // console.log(`Using cached entry (MR IID: ${requestIid})`)
     handleMergeRequestApprovalInjection(requestIid, cachedMergeRequest, mergeRequestView)
   }
 }
@@ -79,10 +74,6 @@ function parseApprovals (projectId, mergeRequestId, requestView) {
  * @param {*} requestView the view to inject the data into.
  */
 function handleMergeRequestApprovalInjection (mergeRequestId, mergeRequest, requestView) {
-  if (mergeRequest.approved_by.length === 0) {
-    console.log(`No approvals for: ${mergeRequestId}`)
-  }
-
   // Add the larger author div
   if (authorEnabled) {
     injectAuthorView(requestView)
@@ -159,12 +150,21 @@ function injectApprovalListCompact (requestView, requiredApprovalsLeft, approval
  * @param {Element} requestView the HTML element reference to the Merge Request row.
  */
 function injectAuthorView (requestView) {
-  $(requestView).find('a.author_link.has-tooltip')
-    .find('img')
-    .removeClass('s16')
-    .addClass('s36')
-    .parent()
-    .prependTo(requestView)
+  if ($(requestView).find('a.author_link.has-tooltip').length) {
+    $(requestView).find('a.author_link.has-tooltip')
+      .find('img')
+      .removeClass('s16')
+      .addClass('s36')
+      .parent()
+      .prependTo(requestView)
+  } else {
+    $(requestView).find('a.author-link.has-tooltip')
+      .find('img')
+      .removeClass('s16')
+      .addClass('s36')
+      .parent()
+      .prependTo(requestView)
+  }
 }
 
 /**
@@ -200,35 +200,25 @@ function createRequiredApprovalDiv () {
  * Loads up the settings, and then begins pulling in the merge request approval info.
  */
 function getSettingsAndStart () {
-  let pageType = getQueryParam('state')
-  let page = getQueryParam('page')
-
   chrome.storage.local.get(null, function (settings) {
-    if (settings['compact-approval']) {
+    if (typeof settings['compact-approval'] !== 'undefined') {
       compactApprovals = settings['compact-approval']
     }
-    if (settings['author']) {
+    if (typeof settings['author'] !== 'undefined') {
       authorEnabled = settings['author']
     }
 
-    // Get all merge requests
-    parseMergeRequestsOnPage(page, pageType)
+    if (window.location.href.indexOf('merge_requests') !== -1) {
+      if (window.location.href.indexOf('new') !== -1) {
+        if (typeof settings['auto-select-force-remove'] !== 'undefined') {
+          $('#merge_request_force_remove_source_branch').prop("checked", settings['auto-select-force-remove'])
+        }
+      } else {
+        // Get all merge requests
+        parseMergeRequestsOnPage()
+      }
+    }
   })
-}
-
-/**
- * Utility method that fetches URL query params of the current tab.
- * @param {String} key the query param to get.
- * @param {String} url a prebuilt url to work with instead of the current page.
- */
-function getQueryParam (key, url) {
-  if (!url) url = window.location.href
-  key = key.replace(/[\[\]]/g, '\\$&')
-  var regex = new RegExp('[?&]' + key + '(=([^&#]*)|&|#|$)')
-  var results = regex.exec(url)
-  if (!results) return null
-  if (!results[2]) return ''
-  return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
 // Begin running

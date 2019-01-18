@@ -10,17 +10,27 @@ After switching over to GitLab, I noticed that when relying on an approval syste
 3. Drag and drop the file into the window and install.
 4. You're done!
 
-Note: this process may change as I become more familiar with formal release strategies of Chrome Extensions. Check back later!
+Otherwise, got to the chrome web store!
 
 ## Current Limitations
 
 ### Settings
 
-Currently, this is tied to my personal workplace domain hosting of GitLab. I wish to fix this with an options page eventually, but as of today it will only work on the following host: `https://gitlab.nordstorm.com`
+There are a few settings available -- check out the options panel for the extension for more info!
 
-If you'd like it to work on other domains, feel free to modify the source urls found in the `manifest.json` and `js/gitlab_api.js`.
+The extension now works on ALL domains (that I've tested). If you have any issues with any particular domain, leave an issue for me to review!
 
 ## Changelog
+### Jan. 18th, 2019 (v1.3.0):
+* Hosted on the chrome web store now!
+* Now works with ANY gitlab host!
+* Fixed an issue with settings not working
+* Reduced potential calls to 0 on subsequent page refresh (got rid of the initial API request that did MR status checks)
+* Fixed a bunch of issues with sorting/searching/ordering/page views due to new method of getting time stamps for MRs
+* Added new setting
+    * Now you can automatically have it mark the checkbox to auto remove a branch once an MR has been merged. This is disabled by default.
+* Cleaned up some code -- internal stuff that ended up looking better due to new cache checks. Page loads are faster!
+
 ### Jan. 18th, 2019 (v1.2.1):
 * Fixed an issue with the first request for the opened MRs not loading
 
