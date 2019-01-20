@@ -97,14 +97,13 @@ function handleMergeRequestApprovalInjection (mergeRequestId, mergeRequest, requ
  */
 function injectApprovalList (requestView, requiredApprovalsLeft, approvalUsers) {
   // Create the initial divs that wrap the approvals -- similar to the one found when viewing the MR
-  var listContainer = `<div class="approved-by-users approvals-footer clearfix mr-info-list"><div class="approvers-prefix"><p>Approved by</p><div class="approvers-list">`
+  let listContainer = `<div class="approved-by-users approvals-footer clearfix mr-info-list"><div class="approvers-prefix"><p>Approved by</p><div class="approvers-list">`
   approvalUsers.forEach(entry => {
     listContainer += createApprovalDiv(entry.user)
   })
 
   // Insert required approval slots (if any are needed)
-  var i = 0
-  for (i = 0; i < requiredApprovalsLeft; i++) {
+  for (let i = 0; i < requiredApprovalsLeft; i++) {
     listContainer += createRequiredApprovalDiv()
   }
 
@@ -125,14 +124,13 @@ function injectApprovalList (requestView, requiredApprovalsLeft, approvalUsers) 
  */
 function injectApprovalListCompact (requestView, requiredApprovalsLeft, approvalUsers) {
   // Create the initial divs that wrap the approvals -- similar to the one found when viewing the MR
-  var listContainer = `<div class="approved-by-users approvals-footer"><div class="approvers-prefix"><div class="approvers-list">`
+  let listContainer = `<div class="approved-by-users approvals-footer"><div class="approvers-prefix"><div class="approvers-list">`
   approvalUsers.forEach(entry => {
     listContainer += createApprovalDiv(entry.user)
   })
 
   // Insert required approval slots (if any are needed)
-  var i = 0
-  for (i = 0; i < requiredApprovalsLeft; i++) {
+  for (let i = 0; i < requiredApprovalsLeft; i++) {
     listContainer += createRequiredApprovalDiv()
   }
 
@@ -152,6 +150,7 @@ function injectApprovalListCompact (requestView, requiredApprovalsLeft, approval
  * @param {Element} requestView the HTML element reference to the Merge Request row.
  */
 function injectAuthorView (requestView) {
+  // Check for if we're on the updated version of their css
   if ($(requestView).find('a.author_link.has-tooltip').length) {
     $(requestView).find('a.author_link.has-tooltip')
       .find('img')
