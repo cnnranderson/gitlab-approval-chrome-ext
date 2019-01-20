@@ -21,7 +21,7 @@ function parseMergeRequestsOnPage () {
   let projectId = getProjectId()
   let liveCacheRefIds = []
 
-  $('.merge-request').each(function (index) {
+  $('li.merge-request').each(function (index) {
     // Parse out the Merge Request Iid (used for getting appr)
     let requestView = this
     let ref = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/')
