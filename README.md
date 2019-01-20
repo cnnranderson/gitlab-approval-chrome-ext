@@ -20,4 +20,5 @@ There are a few settings available -- check out the options panel for the extens
 
 The extension now works on ALL domains (that I've tested). If you have any issues with any particular domain, leave an issue for me to review!
 
-### [Find it here](CHANGELOG.md)
+
+### [Changelog](CHANGELOG.md)
