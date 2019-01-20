@@ -7,7 +7,8 @@
         {
             "run_at": "document_end",
             "matches": [
-                "https://*/*/merge_requests*"
+                "https://*.gitlab.com/*/merge_requests*",
+                "https://*.nordstrom.com/*/merge_requests*"
             ],
             "js": [
                 "thirdparty/jquery.min.js",
@@ -27,6 +28,5 @@
         "48": "images/gitlab.png",
         "128": "images/gitlab.png"
       },
-    "options_page": "html/options.html",
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self' https://gitlab.nordstrom.com/*/merge_requests"
+    "options_page": "html/options.html"
 }

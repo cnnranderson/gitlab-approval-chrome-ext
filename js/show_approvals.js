@@ -2,8 +2,8 @@
 
 // TODO: This file needs a lot of cleaning up.
 // Settings
-var compactApprovals = true
-var authorEnabled = true
+let compactApprovals = true
+let authorEnabled = true
 
 /**
  * Scrapes the project id from the page.
@@ -18,16 +18,17 @@ function getProjectId () {
  */
 function parseMergeRequestsOnPage () {
   // Get the project id
-  var projectId = getProjectId()
-  var liveCacheRefIds = []
+  let projectId = getProjectId()
+  let liveCacheRefIds = []
 
   $('.merge-request').each(function (index) {
     // Parse out the Merge Request Iid (used for getting appr)
-    var ref = $(this).find('.merge-request-title-text a:first').attr('href').split('/')
-    var requestIid = ref[ref.length - 1]
+    let requestView = this
+    let ref = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/')
+    let requestIid = ref[ref.length - 1]
     liveCacheRefIds.push(`${projectId}:${requestIid}`)
     getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
-      var checkDate = new Date(cachedResult.updated_at) < new Date($(this).find('time').attr('datetime'))
+      let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
       if (checkDate) {
         onCacheEntryChecked(projectId, requestIid)
       } else {
@@ -70,9 +71,9 @@ function parseApprovals (projectId, mergeRequestId, requestView) {
 
 /**
  * Handles the injection of approvals for MRs.
- * @param {*} mergeRequestId the iid of the mr.
- * @param {*} mergeRequest the merge request data to inject.
- * @param {*} requestView the view to inject the data into.
+ * @param {Integer} mergeRequestId the iid of the mr.
+ * @param {Object.MergeRequest} mergeRequest the merge request data to inject.
+ * @param {Element} requestView the view to inject the data into.
  */
 function handleMergeRequestApprovalInjection (mergeRequestId, mergeRequest, requestView) {
   // Add the larger author div
@@ -170,7 +171,7 @@ function injectAuthorView (requestView) {
 
 /**
  * Generates a div based on the provided user info.
- * @param {GitLab.User} user an user approval object from the GitLab API.
+ * @param {Object.User} user an user approval object from the GitLab API.
  */
 function createApprovalDiv (user) {
   return `
