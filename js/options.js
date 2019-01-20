@@ -1,5 +1,6 @@
 'use strict'
 
+// TODO: This could all easily be cleaned up. Work on that sometime.
 var compactApprovalCheckbox = 'input[name=compact-approval]'
 var authorCheckbox = 'input[name=author]'
 var autoRemoveCheckbox = 'input[name=auto-select-force-remove]'
@@ -18,6 +19,7 @@ $(authorCheckbox).change(
     })
   })
 
+$(autoRemoveCheckbox).prop('checked', false)
 $(autoRemoveCheckbox).change(
   function () {
     chrome.storage.local.set({ 'auto-select-force-remove': this.checked }, function () {
@@ -58,7 +60,7 @@ function loadSettings () {
     if (exists) {
       $(autoRemoveCheckbox).prop('checked', value)
     } else {
-      $(autoRemoveCheckbox).prop('checked', true)
+      $(autoRemoveCheckbox).prop('checked', false)
     }
   })
 }

@@ -1,5 +1,6 @@
 'use strict'
 
+// TODO: This file needs a lot of cleaning up.
 // Settings
 var compactApprovals = true
 var authorEnabled = true
