@@ -21,6 +21,12 @@ There are a few settings available -- check out the options panel for the extens
 The extension now works on ALL domains (that I've tested). If you have any issues with any particular domain, leave an issue for me to review!
 
 ## Changelog
+### Jan. 19th, 2019 (v1.3.1):
+* Fixes a caching bug which involved getting the wrong time stamp off the page
+* Fixes the generalized permissions issue
+  * Allows me to publish faster
+  * Potentially reduces the number of whitelisted websites that will work with the extension. Going to keep investigating.
+
 ### Jan. 18th, 2019 (v1.3.0):
 * Hosted on the chrome web store now!
 * Now works with ANY gitlab host!
