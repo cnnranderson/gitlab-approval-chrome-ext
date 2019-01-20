@@ -10,7 +10,7 @@ After switching over to GitLab, I noticed that when relying on an approval syste
 3. Drag and drop the file into the window and install.
 4. You're done!
 
-Otherwise, got to the chrome web store!
+Otherwise, got to the [chrome web store](https://chrome.google.com/webstore/detail/gitlab-approvals/pkkmcaoiinhniniafikpmhajlddofikj)!
 
 ## Current Limitations
 
