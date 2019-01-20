@@ -2,8 +2,8 @@
 
 // TODO: This file needs a lot of cleaning up.
 // Settings
-let compactApprovals = true
-let authorEnabled = true
+var compactApprovals = true
+var authorEnabled = true
 
 /**
  * Scrapes the project id from the page.
@@ -14,27 +14,45 @@ function getProjectId () {
 }
 
 /**
- * Scrapes through and gets the ids of the Merge Requests that are currently visible on the page.
+ * Scrapes the group id from the page.
+ * @returns the GitLab group id of the currently viewed group view.
  */
-function parseMergeRequestsOnPage () {
-  // Get the project id
-  let projectId = getProjectId()
-  let liveCacheRefIds = []
+function getGroupId () {
+  return $('[name="group_id"]').val()
+}
 
+/**
+ * Scrapes through and gets the ids of the Merge Requests that are currently visible on the page.
+ * @param {Integer} projectId the project id.
+ */
+function parseMergeRequestsOnPage (projectId) {
   $('li.merge-request').each(function (index) {
     // Parse out the Merge Request Iid (used for getting appr)
     let requestView = this
-    let ref = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/')
-    let requestIid = ref[ref.length - 1]
-    liveCacheRefIds.push(`${projectId}:${requestIid}`)
-    getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
-      let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
-      if (checkDate) {
-        onCacheEntryChecked(projectId, requestIid)
-      } else {
-        onCacheEntryChecked(projectId, requestIid, cachedResult)
-      }
-    })
+    var ref = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/')
+    var requestIid = ref[ref.length - 1]
+    if (isNaN(projectId)) {
+      let projectName = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/merge_requests/')[0].substring(1)
+      getCachedProjectId(projectName, function (projectIdd) {
+        getCachedMergeRequest(`${projectIdd}:${requestIid}`, function (cachedResult) {
+          let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
+          if (checkDate) {
+            onCacheEntryChecked(projectIdd, requestIid)
+          } else {
+            onCacheEntryChecked(projectIdd, requestIid, cachedResult)
+          }
+        })
+      })
+    } else {
+      getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
+        let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
+        if (checkDate) {
+          onCacheEntryChecked(projectId, requestIid)
+        } else {
+          onCacheEntryChecked(projectId, requestIid, cachedResult)
+        }
+      })
+    }
   })
 }
 
@@ -46,7 +64,7 @@ function parseMergeRequestsOnPage () {
  */
 function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
   let mergeRequestView = $(`a[href*="/merge_requests/${requestIid}"`).parents('li.merge-request')
-  if (typeof cachedMergeRequest === 'undefined' || typeof cachedMergeRequest.iid === 'undefined') {
+  if (isNaN(cachedMergeRequest) || isNaN(cachedMergeRequest.iid)) {
     // console.log(`Create new cached entry (MR IID: ${requestIid})`)
     parseApprovals(projectId, requestIid, mergeRequestView)
   } else {
@@ -63,7 +81,7 @@ function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
  */
 function parseApprovals (projectId, mergeRequestId, requestView) {
   getApprovals(projectId, mergeRequestId)
-    .then(function (mergeRequest) {
+    .then(mergeRequest => {
       cacheMergeRequest(`${projectId}:${mergeRequestId}`, mergeRequest)
       handleMergeRequestApprovalInjection(mergeRequestId, mergeRequest, requestView)
     })
@@ -201,25 +219,64 @@ function createRequiredApprovalDiv () {
  * Loads up the settings, and then begins pulling in the merge request approval info.
  */
 function getSettingsAndStart () {
-  chrome.storage.local.get(null, function (settings) {
-    if (typeof settings['compact-approval'] !== 'undefined') {
+  chrome.storage.local.get(null, settings => {
+    if (!isNaN(settings['compact-approval'])) {
       compactApprovals = settings['compact-approval']
     }
-    if (typeof settings['author'] !== 'undefined') {
+    if (!isNaN(settings['author'])) {
       authorEnabled = settings['author']
     }
 
+    // Begin parsing and injecting views
     if (window.location.href.indexOf('merge_requests') !== -1) {
-      if (window.location.href.indexOf('new') !== -1) {
-        if (typeof settings['auto-select-force-remove'] !== 'undefined') {
-          $('#merge_request_force_remove_source_branch').prop("checked", settings['auto-select-force-remove'])
+      if (window.location.href.indexOf('groups') !== -1) {
+        // Get all merge requests for a group view
+        if (checkForNewProjects(settings)) {
+          getGroupProjectIds(getGroupId())
+            .then(groupInformation => {
+              groupInformation.projects.forEach(project => {
+                if (!(project.path_with_namespace in settings)) {
+                  cacheProjectId(project.path_with_namespace, project.id)
+                }
+              })
+            }).then(() => {
+              parseMergeRequestsOnPage(null)
+            })
+        } else {
+          // No need to fetch; we have all the required project ids
+          parseMergeRequestsOnPage(null)
+        }
+      } else if (window.location.href.indexOf('new') !== -1) {
+        // Auto-check remove branch checkbox if setting is enabled
+        if (!isNaN(settings['auto-select-force-remove'])) {
+          $('#merge_request_force_remove_source_branch').prop('checked', settings['auto-select-force-remove'])
         }
       } else {
-        // Get all merge requests
-        parseMergeRequestsOnPage()
+        // Get all merge requests for a project view
+        parseMergeRequestsOnPage(getProjectId())
       }
     }
   })
+}
+
+/**
+ * Checks for new projects that are in the group view.
+ * @param {Object} storage chrome storage object. (Just a map of values)
+ * @return true if a new project was found; false otherwise.
+ */
+function checkForNewProjects (storage) {
+  var newProjectFound = false
+  $('li.merge-request').each(function (index) {
+    let projectName = $(this).find('.merge-request-title-text a:first').attr('href')
+      .split('/merge_requests/')[0]
+      .substring(1)
+
+    // Check if we have a project id
+    if (!(projectName in storage)) {
+      newProjectFound = true
+    }
+  })
+  return newProjectFound
 }
 
 // Begin running

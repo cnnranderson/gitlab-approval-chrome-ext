@@ -17,6 +17,19 @@ function getApprovals (projectId, mergeRequestId) {
 }
 
 /**
+ * Fetches all project Ids for a given group via an Xhr request.
+ * @param {Integer} groupId the group id.
+ * @returns xhr response.
+ */
+function getGroupProjectIds (groupId) {
+  console.log(`Fetching project ids... (Group id: ${groupId})`)
+  return makeXhrRequest(
+    HTTP_GET,
+    `${svcHost}/groups/${groupId}/`
+  )
+}
+
+/**
  * Make a URL request using Xhr.
  * @param {String} method the method type of the request (eg. GET, POST, etc)
  * @param {String} url the url to make a request against.
