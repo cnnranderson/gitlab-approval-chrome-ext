@@ -1,4 +1,10 @@
 ## Changelog
+### Jan. 20th, 2019 (v1.3.2):
+* Added Group support
+  * The plugin now works for all composite group views.
+  * Uses a single API call to get project ids (only if it hasn't seen one before!), and then similar functionality as a project view.
+* Added option to clear all cache and settings
+
 ### Jan. 19th, 2019 (v1.3.1):
 * Fixes a caching bug which involved getting the wrong time stamp off the page
 * Fixes the generalized permissions issue
