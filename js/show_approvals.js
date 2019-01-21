@@ -28,18 +28,18 @@ function getGroupId () {
 function parseMergeRequestsOnPage (projectId) {
   $('li.merge-request').each(function (index) {
     // Parse out the Merge Request Iid (used for getting appr)
-    let requestView = this
-    var ref = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/')
+    var requestView = $(this)
+    var ref = $(this).find('.merge-request-title-text a:first').attr('href').split('/')
     var requestIid = ref[ref.length - 1]
     if (isNaN(projectId)) {
-      let projectName = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/merge_requests/')[0].substring(1)
+      var projectName = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/merge_requests/')[0].substring(1)
       getCachedProjectId(projectName, function (projectIdd) {
         getCachedMergeRequest(`${projectIdd}:${requestIid}`, function (cachedResult) {
           let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
           if (checkDate) {
-            onCacheEntryChecked(projectIdd, requestIid)
+            onCacheEntryChecked(projectIdd, requestIid, requestView)
           } else {
-            onCacheEntryChecked(projectIdd, requestIid, cachedResult)
+            onCacheEntryChecked(projectIdd, requestIid, requestView, cachedResult)
           }
         })
       })
@@ -47,9 +47,9 @@ function parseMergeRequestsOnPage (projectId) {
       getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
         let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
         if (checkDate) {
-          onCacheEntryChecked(projectId, requestIid)
+          onCacheEntryChecked(projectId, requestIid, requestView)
         } else {
-          onCacheEntryChecked(projectId, requestIid, cachedResult)
+          onCacheEntryChecked(projectId, requestIid, requestView, cachedResult)
         }
       })
     }
@@ -60,15 +60,15 @@ function parseMergeRequestsOnPage (projectId) {
  * Determines whether to fetch and cache a new MR data point or inject a cache entry.
  * @param {Integer} projectId the project id.
  * @param {Integer} requestIid the merge request iid.
+ * @param {Element} mergeRequestView the merge request view.
  * @param {Object.MergeRequest} cachedMergeRequest a cached merge request approval data set. Could be undefined if no cache entry exists.
  */
-function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
-  let mergeRequestView = $(`a[href*="/merge_requests/${requestIid}"`).parents('li.merge-request')
+function onCacheEntryChecked (projectId, requestIid, mergeRequestView, cachedMergeRequest) {
   if (isNaN(cachedMergeRequest) || isNaN(cachedMergeRequest.iid)) {
-    // console.log(`Create new cached entry (MR IID: ${requestIid})`)
+    // console.log(`Create new cached entry (MR IID: ${requestIid} Project ID: ${projectId})`)
     parseApprovals(projectId, requestIid, mergeRequestView)
   } else {
-    // console.log(`Using cached entry (MR IID: ${requestIid})`)
+    // console.log(`Using cached entry (MR IID: ${requestIid} Project ID: ${projectId})`)
     handleMergeRequestApprovalInjection(requestIid, cachedMergeRequest, mergeRequestView)
   }
 }
@@ -81,7 +81,7 @@ function onCacheEntryChecked (projectId, requestIid, cachedMergeRequest) {
  */
 function parseApprovals (projectId, mergeRequestId, requestView) {
   getApprovals(projectId, mergeRequestId)
-    .then(mergeRequest => {
+    .then(function (mergeRequest) {
       cacheMergeRequest(`${projectId}:${mergeRequestId}`, mergeRequest)
       handleMergeRequestApprovalInjection(mergeRequestId, mergeRequest, requestView)
     })
@@ -219,7 +219,7 @@ function createRequiredApprovalDiv () {
  * Loads up the settings, and then begins pulling in the merge request approval info.
  */
 function getSettingsAndStart () {
-  chrome.storage.local.get(null, settings => {
+  chrome.storage.local.get(null, function (settings) {
     if (!isNaN(settings['compact-approval'])) {
       compactApprovals = settings['compact-approval']
     }
@@ -233,13 +233,13 @@ function getSettingsAndStart () {
         // Get all merge requests for a group view
         if (checkForNewProjects(settings)) {
           getGroupProjectIds(getGroupId())
-            .then(groupInformation => {
-              groupInformation.projects.forEach(project => {
+            .then(function (groupInformation) {
+              groupInformation.projects.forEach(function (project) {
                 if (!(project.path_with_namespace in settings)) {
                   cacheProjectId(project.path_with_namespace, project.id)
                 }
               })
-            }).then(() => {
+            }).then(function () {
               parseMergeRequestsOnPage(null)
             })
         } else {
