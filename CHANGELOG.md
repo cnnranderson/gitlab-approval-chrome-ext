@@ -1,4 +1,8 @@
 ## Changelog
+### Jan. 21st, 2019 (v1.3.3):
+* Fix for very large group views
+  * There was an issue with the selector on merge request `li` items in the group view which caused massive mix ups of where to inject approvals and move author views around.
+
 ### Jan. 20th, 2019 (v1.3.2):
 * Added Group support
   * The plugin now works for all composite group views.
