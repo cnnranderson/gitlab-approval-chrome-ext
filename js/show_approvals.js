@@ -27,15 +27,27 @@ function getGroupId () {
  */
 function parseMergeRequestsOnPage (projectId) {
   $('li.merge-request').each(function (index) {
-    // Parse out the Merge Request Iid (used for getting appr)
+    // Parse out the Merge Request Iid (used for getting approvals)
     var requestView = $(this)
-    var ref = $(this).find('.merge-request-title-text a:first').attr('href').split('/')
+    var ref = $(this)
+      .find('.merge-request-title-text a:first')
+      .attr('href')
+      .split('/')
     var requestIid = ref[ref.length - 1]
+
     if (isNaN(projectId)) {
-      var projectName = $(requestView).find('.merge-request-title-text a:first').attr('href').split('/merge_requests/')[0].substring(1)
+      var projectName = $(requestView)
+        .find('.merge-request-title-text a:first')
+        .attr('href')
+        .split('/merge_requests/')[0]
+        .substring(1)
       getCachedProjectId(projectName, function (projectIdd) {
         getCachedMergeRequest(`${projectIdd}:${requestIid}`, function (cachedResult) {
-          let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
+          let mrUpdatedTime = $(requestView)
+            .find('.issuable-updated-at')
+            .find('time')
+            .attr('datetime')
+          let checkDate = new Date(cachedResult.updated_at) < new Date(mrUpdatedTime)
           if (checkDate) {
             onCacheEntryChecked(projectIdd, requestIid, requestView)
           } else {
@@ -44,8 +56,16 @@ function parseMergeRequestsOnPage (projectId) {
         })
       })
     } else {
+      // Parse a main repo MR
       getCachedMergeRequest(`${projectId}:${requestIid}`, function (cachedResult) {
-        let checkDate = new Date(cachedResult.updated_at) < new Date($(requestView).find('.issuable-updated-at').find('time').attr('datetime'))
+        let checkDate =
+          new Date(cachedResult.updated_at) <
+          new Date(
+            $(requestView)
+              .find('.issuable-updated-at')
+              .find('time')
+              .attr('datetime')
+          )
         if (checkDate) {
           onCacheEntryChecked(projectId, requestIid, requestView)
         } else {
@@ -80,11 +100,10 @@ function onCacheEntryChecked (projectId, requestIid, mergeRequestView, cachedMer
  * @param {Element} requestView the HTML element reference to the Merge Request row.
  */
 function parseApprovals (projectId, mergeRequestId, requestView) {
-  getApprovals(projectId, mergeRequestId)
-    .then(function (mergeRequest) {
-      cacheMergeRequest(`${projectId}:${mergeRequestId}`, mergeRequest)
-      handleMergeRequestApprovalInjection(mergeRequestId, mergeRequest, requestView)
-    })
+  getApprovals(projectId, mergeRequestId).then(function (mergeRequest) {
+    cacheMergeRequest(`${projectId}:${mergeRequestId}`, mergeRequest)
+    handleMergeRequestApprovalInjection(mergeRequestId, mergeRequest, requestView)
+  })
 }
 
 /**
@@ -169,21 +188,22 @@ function injectApprovalListCompact (requestView, requiredApprovalsLeft, approval
  */
 function injectAuthorView (requestView) {
   // Check for if we're on the updated version of their css
+  let authorElement
   if ($(requestView).find('a.author_link.has-tooltip').length) {
-    $(requestView).find('a.author_link.has-tooltip')
-      .find('img')
-      .removeClass('s16')
-      .addClass('s36')
-      .parent()
-      .prependTo(requestView)
+    authorElement = 'a.author_link.has-tooltip'
   } else {
-    $(requestView).find('a.author-link.has-tooltip')
-      .find('img')
-      .removeClass('s16')
-      .addClass('s36')
-      .parent()
-      .prependTo(requestView)
+    authorElement = 'a.author-link.has-tooltip'
   }
+
+  console.log($(requestView).find(authorElement))
+  // Pull out the author image to the main line item
+  $(requestView)
+    .find(authorElement)
+    .find('img')
+    .removeClass('s16')
+    .addClass('s36')
+    .parent()
+    .prependTo(requestView)
 }
 
 /**
@@ -234,12 +254,13 @@ function getSettingsAndStart () {
         if (checkForNewProjects(settings)) {
           getGroupProjectIds(getGroupId())
             .then(function (groupInformation) {
-              groupInformation.projects.forEach(function (project) {
+              groupInformation.forEach(function (project) {
                 if (!(project.path_with_namespace in settings)) {
                   cacheProjectId(project.path_with_namespace, project.id)
                 }
               })
-            }).then(function () {
+            })
+            .then(function () {
               parseMergeRequestsOnPage(null)
             })
         } else {
@@ -267,7 +288,9 @@ function getSettingsAndStart () {
 function checkForNewProjects (storage) {
   var newProjectFound = false
   $('li.merge-request').each(function (index) {
-    let projectName = $(this).find('.merge-request-title-text a:first').attr('href')
+    let projectName = $(this)
+      .find('.merge-request-title-text a:first')
+      .attr('href')
       .split('/merge_requests/')[0]
       .substring(1)
 
