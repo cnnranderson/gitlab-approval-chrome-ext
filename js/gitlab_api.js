@@ -20,7 +20,7 @@ function getApprovals (projectId, mergeRequestId) {
  */
 function getGroupProjectIds (groupId) {
   console.log(`Fetching project ids... (Group id: ${groupId})`)
-  return makeXhrRequest(HTTP_GET, `${svcHost}/groups/${groupId}/projects?include_subgroups=true`)
+  return makeXhrRequest(HTTP_GET, `${svcHost}/groups/${groupId}/projects?include_subgroups=true&per_page=100`)
 }
 
 /**
