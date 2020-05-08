@@ -1,7 +1,7 @@
 'use strict'
 
 const HTTP_GET = 'GET'
-var svcHost = 'https://' + (new URL(window.location.href).hostname) + '/api/v4'
+var svcHost = 'https://' + new URL(window.location.href).hostname + '/api/v4'
 
 /**
  * Fetches all approvals for a given Merge Request using its iid via an Xhr request.
@@ -10,10 +10,7 @@ var svcHost = 'https://' + (new URL(window.location.href).hostname) + '/api/v4'
  */
 function getApprovals (projectId, mergeRequestId) {
   console.log(`Fetching approvals... (MR iid: ${mergeRequestId})`)
-  return makeXhrRequest(
-    HTTP_GET,
-    `${svcHost}/projects/${projectId}/merge_requests/${mergeRequestId}/approvals/`
-  )
+  return makeXhrRequest(HTTP_GET, `${svcHost}/projects/${projectId}/merge_requests/${mergeRequestId}/approvals/`)
 }
 
 /**
@@ -23,10 +20,7 @@ function getApprovals (projectId, mergeRequestId) {
  */
 function getGroupProjectIds (groupId) {
   console.log(`Fetching project ids... (Group id: ${groupId})`)
-  return makeXhrRequest(
-    HTTP_GET,
-    `${svcHost}/groups/${groupId}/`
-  )
+  return makeXhrRequest(HTTP_GET, `${svcHost}/groups/${groupId}/projects?include_subgroups=true&per_page=100`)
 }
 
 /**
@@ -46,20 +40,24 @@ function makeXhrRequest (method, url) {
       if (xhr.status >= 200 && xhr.status < 300) {
         return resolve(JSON.parse(xhr.response))
       } else {
-        reject(Error({
-          status: xhr.status,
-          statusTextInElse: xhr.statusText
-        }))
+        reject(
+          Error({
+            status: xhr.status,
+            statusTextInElse: xhr.statusText
+          })
+        )
       }
     }
 
     // Error handling
     xhr.onerror = function () {
       console.log(xhr.status)
-      reject(Error({
-        status: xhr.status,
-        statusTextInElse: xhr.statusText
-      }))
+      reject(
+        Error({
+          status: xhr.status,
+          statusTextInElse: xhr.statusText
+        })
+      )
     }
     xhr.send()
   })

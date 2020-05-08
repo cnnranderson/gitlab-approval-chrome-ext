@@ -1,4 +1,8 @@
 ## Changelog
+### Jan. 14th, 2020 (v1.3.4):
+* Added support for Group Views with subgroup projects
+  * Authors and approvals will now properly be fetched for group views. Previously, subgroup projects were not propogating correctly and resulted in undefined project IDs.
+
 ### Jan. 21st, 2019 (v1.3.3):
 * Fix for very large group views
   * There was an issue with the selector on merge request `li` items in the group view which caused massive mix ups of where to inject approvals and move author views around.
